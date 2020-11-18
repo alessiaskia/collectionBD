@@ -383,7 +383,30 @@ var collection = '';
 var numeroTome = '';
 var resume = '';
 var like = true;
-var emprunt = false;
+var emprunt = true;
+
+// indications de collections/serie/numero de tome
+// fonction pour vérifier si info existe/est nulle
+
+// version avec if/else
+// function getValidInfo(info, message, error) {
+//   if ((info === null) || (info === undefined)) {
+//     return `<li>${message}</li>`;
+//   }
+//   return `<li>${message}</li>`;
+// }
+
+// version avec condition ternaire
+function getValidInfo(info, message, error) {
+  var result = (info === null) || (info === undefined) ? error : info; // car seulement deux possibilités
+  return `<li>${message} : ${result}</li>`;
+}
+
+// checker si like exprimé et si oui/non
+function isChecked(info, message, error) {
+  var result = (info === undefined) || !info ? error : info;
+  return `<li>${message} : ${result}</li>`;
+}
 
 for (var bd of bds) {
   livre = '<ul class= "livre">';
@@ -399,49 +422,37 @@ for (var bd of bds) {
   var isbn = `<li>ISBN : ${bd.isbn}</li>`;
   var anneeParution = `<li>Année de parution : ${bd.anneeParution}</li>`;
 
-  // pour les livres sans indications de collections/serie/numero de tome
-  if ((bd.collection === null) || (bd.collection === undefined)) {
-    collection = '<li>Collection : aucune</li>';
-  } else {
-    collection = `<li>Collection : ${bd.collection}</li>`;
-  }
-  if ((bd.serie === null) || (bd.serie === undefined)) {
-    serie = '<li>Série : aucune</li>';
-  } else {
-    serie = `<li>Série : ${bd.serie}</li>`;
-  }
-  if ((bd.numeroTome === null) || (bd.numeroTome === undefined)) {
-    numeroTome = '<li>Numéro de tome : aucun</li>';
-  } else {
-    numeroTome = `<li>Numéro de tome : ${bd.numeroTome}</li>`;
-  }
+  // collection
+  collection = getValidInfo(bd.collection, 'Collection', 'aucune');
+
+  // serie
+  serie = getValidInfo(bd.serie, 'Serie', 'aucune');
+
+  // numero tome
+  serie = getValidInfo(bd.numeroTome, 'Numéro de tome', 'aucun');
 
   // like
-  if ((bd.like === undefined) || !bd.like) {
-    like = '<li>Like ? Non</li>';
-  } else {
-    like = '<li>Like ? Oui</li>';
-  }
+  like = isChecked(bd.like, 'Liked', 'Non');
 
   // emprunté
-  if ((bd.emprunt === true)) {
-    emprunt = '<li>Emprunté : Oui </li>';
-  } else {
-    emprunt = '<li>Emprunté : Non </li><button class="emprunter">Emprunter</button>';
-  }
+  emprunt = isChecked(bd.emprunt, 'Emprunté ? ', 'Non');
+  emprunt += '<button class="emprunter">Emprunter</button>';
 
   // resume: premiers 30 caractères + bouton pour lire la suite
   resume = `<li><span class="visible">Résumé : ${bd.resume.substr(0, 31)}</span><button class="lireSuite">Lire la suite</button><span class="cache">${bd.resume.substr(31, 1000)}</span></li>`;
 
-  livre += titre += image += id += editeur += collection += serie += resume += type += etat += isbn += anneeParution += numeroTome += prix += themes += auteurs += like += emprunt += '</ul>';
+  // assembler tout le catalogue + l'envoyer au html
+  livre += `${titre + image + id + editeur + collection + serie + resume + type + etat + isbn + anneeParution + numeroTome + prix + themes + auteurs + like + emprunt}</ul>`;
   catalogue += livre;
 }
-
 catalogue += '</ul>';
-var panier = '<div class="panier"><h3>Panier</h3><p class="listeEmpruntes"></p></div>';
 app.innerHTML += catalogue;
+
+// panier
+var panier = '<div class="panier"><h3>Panier</h3><p class="listeEmpruntes"></p></div>';
 app.innerHTML += panier;
 
+// boutons Lire la Suite
 var buttonsResume = document.querySelectorAll('.lireSuite');
 for (var button of buttonsResume) {
   button.addEventListener('click', function (e) {
@@ -450,6 +461,7 @@ for (var button of buttonsResume) {
   });
 }
 
+// boutons pour rajouter un livre au panier
 var buttonsEmprunt = document.querySelectorAll('.emprunter');
 var emprunte = document.querySelector('.listeEmpruntes');
 for (var buttonEmprunt of buttonsEmprunt) {
@@ -458,28 +470,3 @@ for (var buttonEmprunt of buttonsEmprunt) {
     emprunte.innerHTML += `<p>${titreChoisi.innerHTML}</p>`;
   });
 }
-
-// essai tuto
-// var buttonResume = document.querySelectorAll('.lireSuite');
-// function showResume() {
-//   buttonResume.nextElementSibling.classList.add('visible');
-//   buttonResume.parentNode.removeChild(buttonResume);
-// }
-// for (var i = 0; i < buttonResume.length; i++) {
-//   buttonResume[i].addEventListener('click', showResume);
-// }
-
-// VERSION 2 : AVEC OBJECT.ENTRIES
-// transformer les objets en array avec Object.entries
-// var livre = '';
-// for (var bd of bds) {
-//   var arrayLivre = bd;
-//   var entries = Object.entries(arrayLivre);
-
-//   // afficher chaque arrayLivre
-//   for (var [name, property] of entries) {
-//     livre += '<ul class="livre">';
-//     livre += `<li>${name} : ${property}</li>`;
-//     livre += '</ul>';
-//   }
-// }
